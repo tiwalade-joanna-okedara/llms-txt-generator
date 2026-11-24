@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>llms.txt generator and AI crawler checklist</title>
+<meta name="description" content="Paste your sitemap or a list of URLs and get an llms.txt file, plus robots.txt rules for AI crawlers.">
+<link rel="stylesheet" href="style.css"></head><body><div class="wrap">
+<header class="top"><h1>llms.txt generator 🤖</h1><a href="https://github.com/tiwalade-joanna-okedara/llms-txt-generator">GitHub</a></header>
+<p class="tag">Paste your sitemap XML or a list of URLs. Get an <code>llms.txt</code> file and the robots.txt lines for AI crawlers. Runs in your browser.</p>
+<div class="card row"><div><label for="n">Site name</label><input id="n" value="Acme"></div><div><label for="s">One-line summary</label><input id="s" value="Acme helps small businesses send invoices and get paid."></div></div>
+<div class="card"><label for="u">Sitemap XML or URLs (one per line)</label><textarea id="u" rows="7">https://example.com/
+https://example.com/pricing/
+https://example.com/product/crm/
+https://example.com/product/inbox/
+https://example.com/blog/how-to-follow-up-with-leads/
+https://example.com/legal/privacy/</textarea>
+<label for="o">Treat URLs containing these as optional (comma separated)</label><input id="o" value="/legal/"></div>
+<div class="card"><h3>llms.txt</h3><pre id="out"></pre><button id="cp">Copy llms.txt</button> <button id="dl">Download</button></div>
+<div class="card"><h3>AI crawlers: who can read your site?</h3><p class="muted">Untick a crawler to block it. Blocking search and user-fetch bots can keep you out of AI answers.</p><div id="bots"></div><pre id="robots"></pre></div>
+<div class="card"><h3>Checklist</h3><ol><li>Upload <code>llms.txt</code> to your site root, e.g. <code>example.com/llms.txt</code>.</li><li>Check robots.txt doesn't block the search bots you want citing you.</li><li>Make sure key pages render text without JavaScript.</li><li>Keep the summary line factual. It's what a model reads first.</li></ol></div>
+<footer>Format follows the <a href="https://llmstxt.org/">llms.txt proposal</a>. Made by <a href="https://github.com/tiwalade-joanna-okedara">Tiwalade Joanna Okedara-Kalu</a> · MIT licence</footer>
+</div><script src="llms.js"></script><script>
+const $=i=>document.getElementById(i),allow={};
+$('bots').innerHTML=AI_CRAWLERS.map(([b,d])=>`<label style="display:block;font-weight:400"><input type="checkbox" data-b="${b}" checked style="width:auto"> <b>${b}</b> <span class="muted">${d}</span></label>`).join('');
+function run(){$('out').textContent=buildLlmsTxt({name:$('n').value,summary:$('s').value,urls:parseUrls($('u').value),optional:$('o').value.split(',').map(x=>x.trim()).filter(Boolean)});
+ document.querySelectorAll('[data-b]').forEach(c=>allow[c.dataset.b]=c.checked);$('robots').textContent=robotsBlock(allow);}
+document.querySelectorAll('input,textarea').forEach(e=>e.addEventListener('input',run));
+$('cp').onclick=()=>navigator.clipboard.writeText($('out').textContent);
+$('dl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([$('out').textContent],{type:'text/plain'}));a.download='llms.txt';a.click();};run();
+</script></body></html>
